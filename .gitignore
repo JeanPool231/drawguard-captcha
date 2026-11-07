@@ -6,3 +6,4 @@ datos/
 __pycache__/
 .ipynb_checkpoints/
 .claude/settings.local.json
+resultados.json
