@@ -2,113 +2,111 @@
 <html lang="es">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="theme-color" content="#F7C600">
 <title>DrawCAPTCHA · Captura</title>
 <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-<header>
-  <div class="bar">
-    <div class="logo"><span>PC03</span> DrawCAPTCHA · Captura de dataset</div>
-    <nav>
-      <button data-tab="capturar" class="on">✏️ Capturar</button>
-      <button data-tab="revisar">🔍 Revisar</button>
-      <button data-tab="progreso">📊 Progreso</button>
-    </nav>
-  </div>
+<body class="lapiz">
+<svg class="sprite" aria-hidden="true">
+  <symbol id="f-estrella" viewBox="0 0 24 24"><path d="M12 2.5l2.9 6.2 6.6.8-4.9 4.6 1.3 6.7-5.9-3.3-5.9 3.3 1.3-6.7-4.9-4.6 6.6-.8z"/></symbol>
+  <symbol id="f-rayo" viewBox="0 0 24 24"><path d="M13.5 2 5 13.5h6L9.5 22 19 9.5h-6.5z"/></symbol>
+  <symbol id="f-espiral" viewBox="0 0 24 24"><path d="M12 12a1.5 1.5 0 0 1 3 0 3.5 3.5 0 0 1-7 0 5.5 5.5 0 0 1 11 0 7.5 7.5 0 0 1-15 0 8.5 8.5 0 0 1 17 0"/></symbol>
+  <symbol id="f-corazon" viewBox="0 0 24 24"><path d="M12 20.5S3 15 3 8.8A4.8 4.8 0 0 1 12 6.5a4.8 4.8 0 0 1 9 2.3C21 15 12 20.5 12 20.5z"/></symbol>
+  <symbol id="f-nube" viewBox="0 0 24 24"><path d="M7 18.5a4 4 0 0 1-.6-8 5.5 5.5 0 0 1 10.6-1.3 4.7 4.7 0 0 1 .5 9.3z"/></symbol>
+</svg>
+
+<header class="cabecera">
+  <span class="marca">DrawCAPTCHA</span>
+  <nav aria-label="Secciones">
+    <button data-tab="capturar" class="on" aria-current="page">Capturar</button>
+    <button data-tab="revisar">Revisar</button>
+    <button data-tab="progreso">Progreso</button>
+  </nav>
 </header>
 
 <main>
-  <!-- ================= PASO 1: INICIO ================= -->
-  <section id="inicio" class="card">
-    <h1>Bienvenido 👋</h1>
-    <p class="muted">Esta página captura los dibujos que usará la red neuronal del CAPTCHA.
-      Cada dibujo se guarda automáticamente en la carpeta <code>dataset/&lt;clase&gt;/</code>.</p>
-    <div class="steps">
-      <div class="step"><b>1. Tu nombre</b>Así sabemos quién dibujó cada imagen.</div>
-      <div class="step"><b>2. Dibuja lo que pide</b>El sistema te pide una figura al azar.</div>
-      <div class="step"><b>3. Guarda</b>Pulsa <i>Guardar</i> o <kbd>Enter</kbd> y sigue con la siguiente.</div>
-      <div class="step"><b>4. Revisa</b>En la pestaña <i>Revisar</i> borra dibujos malos.</div>
-    </div>
-    <label for="autor">Nombre de quien dibuja</label>
-    <input id="autor" placeholder="Ej: Juan Perez" maxlength="30" autocomplete="off">
-    <label for="meta">Meta de dibujos por figura (para esta persona)</label>
+  <!-- ================= INICIO ================= -->
+  <section id="inicio">
+    <h1>Dibuja 5 figuras</h1>
+    <p>Tus dibujos entrenan la red del CAPTCHA. Hazlos con tu propio estilo y varía el tamaño y la posición.</p>
+    <label for="autor">Tu nombre</label>
+    <input id="autor" placeholder="Ej: Juan Perez" maxlength="30" autocomplete="off" enterkeyhint="go">
+    <label for="meta">Meta por figura</label>
     <select id="meta">
-      <option value="20">20 por figura (100 en total · ~8 min)</option>
-      <option value="40" selected>40 por figura (200 en total · ~15 min)</option>
-      <option value="60">60 por figura (300 en total · ~25 min)</option>
-      <option value="100">100 por figura (500 en total)</option>
+      <option value="20">20 por figura: 100 dibujos, unos 8 min</option>
+      <option value="40" selected>40 por figura: 200 dibujos, unos 15 min</option>
+      <option value="60">60 por figura: 300 dibujos, unos 25 min</option>
+      <option value="100">100 por figura: 500 dibujos</option>
     </select>
-    <div style="margin-top:18px; display:flex; gap:10px; flex-wrap:wrap">
-      <button class="btn primary" id="empezar">Empezar a dibujar →</button>
-    </div>
+    <p class="msg bad" id="errorInicio" role="alert"></p>
+    <button class="btn primary" id="empezar">Empezar a dibujar</button>
   </section>
 
-  <!-- ================= PASO 2: CAPTURA ================= -->
+  <!-- ================= CAPTURA ================= -->
   <section id="captura" class="hidden">
-    <div class="layout">
-      <div class="card captcha">
-        <div class="cap-head">
-          <small>Verificación humana · dibuja la figura</small>
-          <div class="target"><span class="emoji" id="emoji">⭐</span><span id="objetivo">ESTRELLA</span></div>
-        </div>
-        <div class="canvas-wrap"><canvas id="lienzo" width="280" height="280"></canvas></div>
-        <div class="msg" id="msg"></div>
-        <div class="cap-foot">
-          <button class="btn" id="deshacerTrazo">↶ Trazo<kbd>Z</kbd></button>
-          <button class="btn" id="limpiar">Limpiar<kbd>C</kbd></button>
-          <button class="btn" id="saltar">Saltar<kbd>S</kbd></button>
-          <button class="btn danger" id="deshacerGuardado" disabled>Borrar último</button>
-          <button class="btn primary" id="guardar">✓ Guardar y siguiente<kbd style="color:#dbe6ff;border-color:#5c8cf0">Enter</kbd></button>
-        </div>
+    <div class="columna">
+    <div class="pedido">
+      <div class="linea">
+        <span id="guia">Dibuja una</span>
+        <span class="quien"><b id="miTotal">0</b> de <span id="miMeta">0</span></span>
+        <span class="persona"><span id="nombreAutor"></span><button class="enlace" id="cambiar" aria-label="Cambiar persona">Cambiar</button></span>
       </div>
-
-      <div>
-        <div class="card">
-          <div style="display:flex; justify-content:space-between; align-items:baseline; gap:10px; flex-wrap:wrap">
-            <h2 style="margin:0">Tu progreso, <span id="nombreAutor"></span></h2>
-            <button class="btn" id="cambiar" style="padding:6px 10px">Cambiar persona</button>
-          </div>
-          <div class="big" id="miTotal">0</div>
-          <div class="muted" style="margin-top:-4px">dibujos guardados por ti · meta <span id="miMeta"></span></div>
-          <div id="miProgreso" style="margin-top:10px"></div>
-        </div>
-        <div class="card" style="margin-top:14px">
-          <h2>Consejos para un buen dataset</h2>
-          <ul class="tips">
-            <li>Dibuja <b>con tu propio estilo</b>: no copies el emoji, es solo una referencia.</li>
-            <li>Varía el <b>tamaño, posición y grosor</b> del dibujo (grande, pequeño, inclinado).</li>
-            <li>No dibujes en el borde ni dejes el dibujo cortado.</li>
-            <li>Si te equivocas usa <b>Limpiar</b>; si ya guardaste, <b>Borrar último</b>.</li>
-            <li>Pide a familiares/amigos que dibujen: más personas = red más robusta.</li>
-          </ul>
-        </div>
-      </div>
+      <h1 id="objetivo">ESTRELLA</h1>
+      <ol id="miProgreso" aria-label="Tu avance por figura"></ol>
+      <ul class="consejos">
+        <li>Dibuja con tu propio estilo: las figuras de arriba son solo una referencia.</li>
+        <li>Cambia el tamaño, la posición y la inclinación.</li>
+        <li>No toques el borde ni dejes el dibujo cortado.</li>
+      </ul>
     </div>
+    <div class="estado">
+      <p class="msg" id="msg" role="status"></p>
+      <button class="enlace goma" id="deshacerGuardado" disabled>Borrar último</button>
+    </div>
+    <div class="acciones">
+      <button class="btn" id="deshacerTrazo">Deshacer<kbd>Z</kbd></button>
+      <button class="btn" id="limpiar">Limpiar<kbd>C</kbd></button>
+      <button class="btn" id="saltar">Saltar<kbd>S</kbd></button>
+      <button class="btn primary" id="guardar">Guardar<span class="extra"> y siguiente</span><kbd>Enter</kbd></button>
+    </div>
+    </div>
+    <div class="marco"><div class="hoja"><canvas id="lienzo" width="280" height="280" aria-label="Lienzo de dibujo"></canvas></div></div>
   </section>
 
   <!-- ================= REVISAR ================= -->
-  <section id="revisar" class="card hidden">
+  <section id="revisar" class="hidden panel">
     <h1>Revisar dibujos</h1>
-    <p class="muted">Elimina dibujos vacíos, cortados o que no correspondan a la figura. Un dataset limpio = mejor precisión.</p>
-    <div style="display:flex; gap:10px; flex-wrap:wrap; align-items:end">
-      <div style="flex:1; min-width:160px"><label for="filtroClase">Figura</label><select id="filtroClase"></select></div>
-      <div style="flex:1; min-width:160px"><label for="filtroAutor">Autor</label><select id="filtroAutor"></select></div>
-    </div>
-    <p class="muted" id="cuentaRevisar" style="margin:12px 0 0"></p>
+    <p>Marca los dibujos vacíos, cortados o equivocados y bórralos juntos.</p>
+    <div class="chips" id="filtroClase" role="group" aria-label="Figura"></div>
+    <label for="filtroAutor">Autor</label>
+    <select id="filtroAutor"></select>
+    <p id="cuentaRevisar" role="status"></p>
     <div class="grid" id="galeria"></div>
+    <div class="barra hidden" id="barraBorrar">
+      <span id="textoBorrar"></span>
+      <button class="btn" id="quitarMarcas">Quitar marcas</button>
+      <button class="btn borrar" id="abrirBorrar"></button>
+    </div>
+    <dialog id="dialogoBorrar" aria-labelledby="tituloBorrar">
+      <h2 id="tituloBorrar"></h2>
+      <p>Esto no se puede deshacer.</p>
+      <div class="dialogo-botones">
+        <button class="btn" id="cancelarBorrar">Cancelar</button>
+        <button class="btn borrar" id="confirmarBorrar"></button>
+      </div>
+    </dialog>
   </section>
 
   <!-- ================= PROGRESO ================= -->
-  <section id="progreso" class="card hidden">
+  <section id="progreso" class="hidden panel">
     <h1>Progreso del equipo</h1>
-    <p class="muted">Total de imágenes en <code>dataset/</code>. Recomendado: <b>mínimo 150 por figura</b> (ideal 250+), con dibujos de varias personas.</p>
-    <div id="totalProgreso" style="margin:14px 0 20px"></div>
+    <p>Mínimo recomendado: 150 por figura, marcado en cada barra. Lo ideal son 250 o más, de varias personas.</p>
+    <div id="totalProgreso"></div>
     <h2>Por autor</h2>
-    <div style="overflow-x:auto"><table id="tablaAutores"></table></div>
+    <div class="tabla"><table id="tablaAutores"></table></div>
   </section>
 </main>
-<div class="toast" id="toast"></div>
 
 <script src="app.js"></script>
 </body>
