@@ -19,7 +19,7 @@ captura/
   styles.css     estilos
   app.js         lógica: lienzo, flujo de captura, revisar, progreso
 dataset/         dibujos reales, se crea solo. NO versionar
-scripts/         utilidades (dataset sintético para pruebas de humo)
+scripts/         utilidades (dataset sintético para pruebas de humo, normalizar el notebook)
 docs/            guía y notas
 PC03_Codigo_Nombre_Apellido.ipynb   notebook entregable (Colab)
 requirements.txt  README.md  .gitignore  CLAUDE.md
@@ -39,7 +39,8 @@ python scripts\crear_dataset_sintetico.py     # solo prueba de humo
 
 ## Reglas del notebook
 - **Autocontenido**: debe correr en Colab con solo `dataset.zip`. No importar módulos locales ni mover lógica a `src/`.
-- Editar por celdas (NotebookEdit). Nunca reescribir el JSON completo.
+- Editar por celdas (NotebookEdit). Nunca reescribir el JSON completo a mano.
+- Después de NotebookEdit, ejecutar `python scripts\normalizar_notebook.py PC03_Codigo_Nombre_Apellido.ipynb`: devuelve `source` a lista de líneas y mantiene el diff pequeño. Es el único rewrite permitido y no cambia el contenido de las celdas.
 - En el repo, el notebook va sin salidas (mantiene los diffs pequeños). Las salidas se generan en Colab para el informe.
 - Constantes al inicio (`SIZE`, `EPOCAS`, `SEED`, `SPLIT_POR_AUTOR`). Semillas fijas.
 - No ejecutes entrenamientos largos salvo que se pida.
