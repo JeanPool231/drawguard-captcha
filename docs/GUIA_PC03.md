@@ -64,6 +64,7 @@ Si la exactitud sale baja (<85 %): revisa el dataset (pestaña *Revisar*), agreg
 | Dropout | 0.2 / 0.3 / 0.5 / 0.3 |
 | Skip connections (ResNet) | función `bloque_residual` |
 | Matriz de confusión | sección 9 (base y mejorada, conteos y %) |
+| Ablación | sección 9.2: base → +64×64 → +Dropout → +capas → +skip connections |
 | Extra | comparación base vs. mejorada, errores, FAR/FRR, FAR con garabatos, demo interactiva |
 
 Son **5 de 5 mejoras** (piden 3) y el modelo base demuestra que mejoran.
@@ -78,7 +79,7 @@ Son **5 de 5 mejoras** (piden 3) y el modelo base demuestra que mejoran.
 5. **Captura de datos**: captura de la página web, cómo funciona, número de imágenes, autores, gráfico de distribución.
 6. **Preprocesamiento**: inversión, recorte al contenido, 64×64, augmentation.
 7. **Arquitectura**: modelo base vs. ResNet; tabla de las 5 mejoras; diagrama del bloque residual.
-8. **Resultados**: capturas del notebook: curvas, **matriz de confusión**, classification report, tabla comparativa, errores, curva FAR/FRR, demo con ACCESO CONCEDIDO/DENEGADO.
+8. **Resultados**: capturas del notebook: curvas, **matriz de confusión**, classification report, tabla comparativa, tabla de ablación, errores, curva FAR/FRR, demo con ACCESO CONCEDIDO/DENEGADO.
 9. **Discusión**: qué clases se confunden y por qué; efecto del Dropout y de las skip connections.
 10. **Conclusiones y trabajo futuro**.
 11. **Referencias** (He et al. 2016 *Deep Residual Learning*; Srivastava et al. 2014 *Dropout*; von Ahn et al. 2003 *CAPTCHA*; Google Quick, Draw!).
