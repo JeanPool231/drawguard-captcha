@@ -28,3 +28,13 @@ python captura\servidor.py --lan
 
 ## Entrenar
 El entrenamiento real se hace en Google Colab con GPU T4: comprime `dataset/` como `dataset.zip`, sube `PC03_Codigo_Nombre_Apellido.ipynb` y ejecuta todas las celdas. El notebook no necesita ningún otro archivo del repositorio. `requirements.txt` es solo para el entorno local; Colab usa sus propias versiones.
+
+## Prueba de humo
+Comprueba que el notebook corre de punta a punta sin datos reales. Sus métricas no significan nada y nunca se reportan.
+```powershell
+python scripts\crear_dataset_sintetico.py
+$env:PC03_DATASET = "$PWD\datos\sintetico"; $env:PC03_EPOCAS = "2"
+jupyter nbconvert --to notebook --execute PC03_Codigo_Nombre_Apellido.ipynb --output-dir datos\humo
+Remove-Item Env:PC03_DATASET, Env:PC03_EPOCAS
+```
+El resultado queda en `datos\humo`, fuera de git. No guardes salidas en el notebook del repo.
