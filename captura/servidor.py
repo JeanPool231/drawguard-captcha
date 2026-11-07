@@ -6,19 +6,20 @@ No necesita instalar nada: usa solo la libreria estandar de Python.
 Uso:
     python servidor.py            (puerto 8000)
     python servidor.py 8080       (otro puerto)
+    python servidor.py --lan      (abre la red local para capturar desde el celular)
 
 Luego abre en el navegador:  http://localhost:8000
-Tus companeros conectados a la MISMA red WiFi pueden abrir la
-direccion "Red local" que aparece en la consola (sirve en celular/tablet).
+Por defecto solo responde en esta PC. Con --lan, quienes esten en la MISMA red
+WiFi pueden abrir la direccion "Red local" que aparece en la consola (celular/tablet).
 
 Los dibujos se guardan en:  ../dataset/<clase>/<clase>_<autor>_<fecha>.png
 """
+import argparse
 import base64
 import json
 import os
 import re
 import socket
-import sys
 from datetime import datetime
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
@@ -187,15 +188,24 @@ def ip_local():
 
 
 if __name__ == "__main__":
-    puerto = int(sys.argv[1]) if len(sys.argv) > 1 else 8000
-    servidor = ThreadingHTTPServer(("0.0.0.0", puerto), Handler)
+    parser = argparse.ArgumentParser(description="Servidor de captura de dibujos")
+    parser.add_argument("puerto", nargs="?", type=int, default=8000)
+    parser.add_argument("--lan", action="store_true",
+                        help="escuchar en toda la red local (para capturar desde el celular)")
+    args = parser.parse_args()
+    puerto = args.puerto
+    # /api/borrar no tiene autenticacion: la red solo se abre a pedido
+    servidor = ThreadingHTTPServer(("0.0.0.0" if args.lan else "127.0.0.1", puerto), Handler)
     print("=" * 58)
     print("  PC03 - CAPTCHA de dibujo | Captura de dataset")
     print("=" * 58)
     print(f"  Esta PC:    http://localhost:{puerto}")
-    ip = ip_local()
-    if ip:
-        print(f"  Red local:  http://{ip}:{puerto}  (celular en la misma WiFi)")
+    if args.lan:
+        ip = ip_local()
+        if ip:
+            print(f"  Red local:  http://{ip}:{puerto}  (celular en la misma WiFi)")
+        print("  AVISO: /api/borrar no tiene autenticacion; cualquiera en esta")
+        print("  red puede borrar dibujos. Usa --lan solo en una red de confianza.")
     print(f"  Dataset en: {DATASET}")
     print("  Ctrl + C para detener")
     print("=" * 58)
