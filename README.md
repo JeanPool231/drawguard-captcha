@@ -1,7 +1,7 @@
 # DrawCAPTCHA · PC03
 
 CAPTCHA que pide dibujar una figura al azar (estrella, rayo, espiral, corazón o nube). Una CNN verifica que el dibujo corresponde.
-Proyecto del curso Procesamiento de Imágenes (UPC). La guía del trabajo está en [docs/GUIA_PC03.md](docs/GUIA_PC03.md).
+Proyecto del curso Procesamiento de Imágenes (UPC). La estructura del proyecto y los pasos detallados están en [docs/GUIA_PC03.md](docs/GUIA_PC03.md), y el informe en `docs/PC03_Informe.docx`.
 
 ## Instalación (Windows / PowerShell)
 Requiere Python 3.13. Las versiones más nuevas pueden no tener TensorFlow disponible; `py -0p` muestra las instaladas.
