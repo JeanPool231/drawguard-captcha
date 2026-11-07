@@ -35,8 +35,9 @@ Por defecto el servidor solo responde en esta PC. Para capturar desde el celular
 |---|---|---|
 | Mínimo aceptable | 150 | 750 |
 | Recomendado | 250+ | 1250+ |
+| Dataset del equipo | 260 | 1300 |
 
-Por ejemplo, 4 integrantes × 40 por figura = 160 por figura. Si 2 o 3 familiares o amigos dibujan 20–30 cada uno se llega a 250. Con más personas distintas la red es más robusta, y es un dato que se puede contar en la exposición.
+El dataset del equipo tiene 1300 dibujos, 260 por figura, de 4 personas: los 3 integrantes y un colaborador. Con más personas distintas la red es más robusta, y es un dato que se puede contar en la exposición.
 
 ### Juntar el dataset del equipo
 Si cada integrante capturó en su PC, las carpetas `dataset/<clase>/` se copian en una sola (los nombres de archivo no chocan porque llevan autor y fecha). Luego se comprime `dataset` como `dataset.zip`. Todo el equipo usa el mismo `dataset.zip`.
