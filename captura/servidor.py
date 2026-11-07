@@ -27,6 +27,13 @@ CLASES = ["estrella", "rayo", "espiral", "corazon", "nube"]
 AQUI = os.path.dirname(os.path.abspath(__file__))
 DATASET = os.path.abspath(os.path.join(AQUI, "..", "dataset"))
 PNG_HEADER = b"\x89PNG\r\n\x1a\n"
+# Lista blanca: ningun otro archivo de captura/ se sirve (ni servidor.py)
+ESTATICOS = {
+    "/": "/index.html",
+    "/index.html": "/index.html",
+    "/styles.css": "/styles.css",
+    "/app.js": "/app.js",
+}
 
 for c in CLASES:
     os.makedirs(os.path.join(DATASET, c), exist_ok=True)
@@ -63,6 +70,13 @@ def conteos():
 
 
 class Handler(SimpleHTTPRequestHandler):
+    # Explicito porque el registro de Windows puede cambiar el MIME de .js
+    extensions_map = {
+        **SimpleHTTPRequestHandler.extensions_map,
+        ".js": "text/javascript; charset=utf-8",
+        ".css": "text/css; charset=utf-8",
+    }
+
     def __init__(self, *a, **kw):
         super().__init__(*a, directory=AQUI, **kw)
 
@@ -114,10 +128,13 @@ class Handler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(datos)
             return
-        if url.path in ("/", "/index.html"):
-            self.path = "/index.html"
+        if url.path in ESTATICOS:
+            self.path = ESTATICOS[url.path]
             return super().do_GET()
         return self._json({"error": "no encontrado"}, 404)
+
+    def do_HEAD(self):  # el heredado se saltaria la lista blanca de do_GET
+        self.send_error(405)
 
     # ---------- POST ----------
     def do_POST(self):
