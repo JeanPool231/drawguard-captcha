@@ -28,8 +28,18 @@
 <main>
   <!-- ================= INICIO ================= -->
   <section id="inicio">
+    <div class="intro">
     <h1>Dibuja 5 figuras</h1>
     <p>Tus dibujos entrenan la red del CAPTCHA. Hazlos con tu propio estilo y varía el tamaño y la posición.</p>
+    <ul class="vista" aria-label="Las 5 figuras">
+      <li><svg class="icono" aria-hidden="true"><use href="#f-estrella"/></svg>Estrella</li>
+      <li><svg class="icono" aria-hidden="true"><use href="#f-rayo"/></svg>Rayo</li>
+      <li><svg class="icono" aria-hidden="true"><use href="#f-espiral"/></svg>Espiral</li>
+      <li><svg class="icono" aria-hidden="true"><use href="#f-corazon"/></svg>Corazón</li>
+      <li><svg class="icono" aria-hidden="true"><use href="#f-nube"/></svg>Nube</li>
+    </ul>
+    </div>
+    <div class="formulario">
     <label for="autor">Tu nombre</label>
     <input id="autor" placeholder="Ej: Juan Perez" maxlength="30" autocomplete="off" enterkeyhint="go">
     <label for="meta">Meta por figura</label>
@@ -41,6 +51,7 @@
     </select>
     <p class="msg bad" id="errorInicio" role="alert"></p>
     <button class="btn primary" id="empezar">Empezar a dibujar</button>
+    </div>
   </section>
 
   <!-- ================= CAPTURA ================= -->
