@@ -107,7 +107,7 @@ function siguiente(saltando) {
   if (!pendientes.length) {
     actual = null;
     $("guia").textContent = "Terminaste"; $("objetivo").textContent = "META CUMPLIDA"; $("objetivo").classList.add("largo");
-    limpiar(); mensaje("Pasa el turno o sube tu meta con el enlace cambiar.", "ok");
+    limpiar(); mensaje("Pasa el turno o sube tu meta con el enlace Cambiar.", "ok");
     $("guardar").disabled = true; pintarMiProgreso();
     return;
   }

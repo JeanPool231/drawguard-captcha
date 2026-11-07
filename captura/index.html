@@ -45,11 +45,12 @@
 
   <!-- ================= CAPTURA ================= -->
   <section id="captura" class="hidden">
+    <div class="columna">
     <div class="pedido">
       <div class="linea">
         <span id="guia">Dibuja una</span>
         <span class="quien"><b id="miTotal">0</b> de <span id="miMeta">0</span></span>
-        <button class="enlace" id="cambiar" aria-label="Cambiar persona"><span id="nombreAutor"></span>: cambiar</button>
+        <span class="persona"><span id="nombreAutor"></span><button class="enlace" id="cambiar" aria-label="Cambiar persona">Cambiar</button></span>
       </div>
       <h1 id="objetivo">ESTRELLA</h1>
       <ol id="miProgreso" aria-label="Tu avance por figura"></ol>
@@ -59,7 +60,6 @@
         <li>No toques el borde ni dejes el dibujo cortado.</li>
       </ul>
     </div>
-    <div class="hoja"><canvas id="lienzo" width="280" height="280" aria-label="Lienzo de dibujo"></canvas></div>
     <div class="estado">
       <p class="msg" id="msg" role="status"></p>
       <button class="enlace goma" id="deshacerGuardado" disabled>Borrar último</button>
@@ -70,6 +70,8 @@
       <button class="btn" id="saltar">Saltar<kbd>S</kbd></button>
       <button class="btn primary" id="guardar">Guardar<span class="extra"> y siguiente</span><kbd>Enter</kbd></button>
     </div>
+    </div>
+    <div class="marco"><div class="hoja"><canvas id="lienzo" width="280" height="280" aria-label="Lienzo de dibujo"></canvas></div></div>
   </section>
 
   <!-- ================= REVISAR ================= -->
