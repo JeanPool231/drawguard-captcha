@@ -49,7 +49,7 @@ Si cada uno capturó en su PC: copien las carpetas `dataset/<clase>/` de todos e
 1. Entra a colab.research.google.com → *Subir* → `PC03_Codigo_Nombre_Apellido.ipynb`.
 2. *Entorno de ejecución → Cambiar tipo de entorno → T4 GPU*.
 3. *Entorno de ejecución → Ejecutar todas*. Cuando lo pida, sube **dataset.zip**.
-4. Al final, en la sección 10.1, **dibuja en el recuadro** y prueba el CAPTCHA.
+4. Al final, en la sección 10.2, **dibuja en el recuadro** y prueba el CAPTCHA.
 5. Completa la sección **12. Conclusiones** con tus números reales.
 6. *Archivo → Descargar .ipynb*. Renómbralo: `PC03_<TuCódigo>_<Nombre>_<Apellido>.ipynb`.
 
@@ -64,7 +64,7 @@ Si la exactitud sale baja (<85 %): revisa el dataset (pestaña *Revisar*), agreg
 | Dropout | 0.2 / 0.3 / 0.5 / 0.3 |
 | Skip connections (ResNet) | función `bloque_residual` |
 | Matriz de confusión | sección 9 (base y mejorada, conteos y %) |
-| Extra | comparación base vs. mejorada, errores, FAR/FRR, demo interactiva |
+| Extra | comparación base vs. mejorada, errores, FAR/FRR, FAR con garabatos, demo interactiva |
 
 Son **5 de 5 mejoras** (piden 3) y el modelo base demuestra que mejoran.
 
