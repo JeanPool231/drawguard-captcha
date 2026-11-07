@@ -1,105 +1,122 @@
-# Guía PC03: DrawCAPTCHA (CAPTCHA de dibujo)
+# Guía técnica de DrawCAPTCHA
 
-## Archivos del proyecto
+Complementa el [README](../README.md) con la estructura del proyecto y los pasos completos para capturar datos, entrenar y probar el notebook.
+
+## Estructura del proyecto
 ```
 drawguard-captcha/
-├── captura/
-│   ├── servidor.py      ← servidor local (no necesita instalar nada)
-│   ├── index.html       ← página de captura estilo CAPTCHA
-│   ├── styles.css       ← estilos
-│   └── app.js           ← lógica de la página
-├── docs/GUIA_PC03.md    ← esta guía
-├── dataset/             ← aquí se guardan los dibujos (se crea solo)
-│   ├── estrella/  rayo/  espiral/  corazon/  nube/
-└── PC03_Codigo_Nombre_Apellido.ipynb   ← notebook (Colab)
+├── captura/                    página web de captura de dibujos
+│   ├── servidor.py             servidor local, solo usa la librería estándar de Python
+│   ├── index.html              estructura de la página
+│   ├── styles.css              estilos
+│   └── app.js                  lienzo, flujo de captura, revisión y progreso
+├── scripts/
+│   ├── crear_dataset_sintetico.py   dataset falso para la prueba de humo
+│   └── normalizar_notebook.py       deja el JSON del notebook en un formato estable
+├── docs/
+│   ├── GUIA_PC03.md            esta guía
+│   └── PC03_Informe.docx       informe del trabajo
+├── PC03_Codigo_Nombre_Apellido.ipynb   notebook de entrenamiento y evaluación (Colab)
+├── requirements.txt            dependencias del entorno local
+└── README.md
 ```
 
-## Paso 1: crear el dataset
+Estas rutas se crean al usar el proyecto y no se suben a git:
 
-1. Abrir una terminal en la carpeta `captura` del repositorio y ejecutar:
-   ```
-   python servidor.py
-   ```
-2. Abrir http://localhost:8000 en el navegador.
-3. Escribir el nombre, elegir la meta (se recomiendan 40 por figura) y pulsar *Empezar*.
-4. La página pide una figura al azar. Se dibuja y se guarda con `Enter` o con *Guardar y siguiente*.
-   * `C` limpia, `Z` deshace un trazo, `S` salta la figura y *Borrar último* elimina el último dibujo guardado.
-5. Al terminar, la PC o el celular pasa a otra persona con el enlace *Cambiar*, junto al nombre.
-6. En la pestaña *Revisar* se marcan los dibujos vacíos, cortados o equivocados y se borran juntos. El borrado no se puede deshacer.
-7. La pestaña *Progreso* muestra cuántas imágenes hay por figura y por autor.
-
-Por defecto el servidor solo responde en esta PC. Para capturar desde el celular se inicia con `python servidor.py --lan` y la consola muestra una dirección *Red local* (ej. `http://192.168.1.5:8000`), que se abre en un celular conectado a la misma WiFi. Dibujar con el dedo da más variedad. Si la página no carga, hay que permitir Python en el Firewall de Windows. `--lan` solo debe usarse en una red de confianza: `/api/borrar` no tiene autenticación y cualquiera en esa red podría borrar dibujos.
-
-### Cantidad de dibujos
-| Nivel | Por figura | Total |
-|---|---|---|
-| Mínimo aceptable | 150 | 750 |
-| Recomendado | 250+ | 1250+ |
-| Dataset del equipo | 260 | 1300 |
-
-El dataset del equipo tiene 1300 dibujos, 260 por figura, de 4 personas: los 3 integrantes y un colaborador. Con más personas distintas la red es más robusta, y es un dato que se puede contar en la exposición.
-
-### Juntar el dataset del equipo
-Si cada integrante capturó en su PC, las carpetas `dataset/<clase>/` se copian en una sola (los nombres de archivo no chocan porque llevan autor y fecha). Luego se comprime `dataset` como `dataset.zip`. Todo el equipo usa el mismo `dataset.zip`.
-
-## Paso 2: entrenar la red (Google Colab)
-1. En colab.research.google.com, *Subir* → `PC03_Codigo_Nombre_Apellido.ipynb`.
-2. *Entorno de ejecución → Cambiar tipo de entorno → T4 GPU*.
-3. *Entorno de ejecución → Ejecutar todas*. Cuando lo pida, subir `dataset.zip`.
-4. Al final, en la sección 10.2, dibujar en el recuadro para probar el CAPTCHA.
-5. Completar la sección 12 (Conclusiones) con los números reales.
-6. *Archivo → Descargar .ipynb* y renombrarlo como `PC03_<Código>_<Nombre>_<Apellido>.ipynb`.
-
-Si la exactitud sale baja (<85 %), hay que revisar el dataset en la pestaña *Revisar*, agregar más dibujos o subir `EPOCAS`.
-
-### Qué cumple el notebook de la consigna
-| Requisito | Dónde |
+| Ruta | Contenido |
 |---|---|
-| Entrada 64×64 | `SIZE = 64` (base: 28×28) |
-| Más épocas | 80 con EarlyStopping (base: 10) |
-| Modificar capas | BatchNorm, 32→256 filtros, GlobalAvgPool, augmentation |
-| Dropout | 0.2 / 0.3 / 0.5 / 0.3 |
-| Skip connections (ResNet) | función `bloque_residual` |
-| Matriz de confusión | sección 9 (base y mejorada, conteos y %) |
-| Ablación | sección 9.2: base → +64×64 → +Dropout → +capas → +skip connections |
-| Extra | comparación base vs. mejorada, errores, robustez (sección 9.4), FAR/FRR, FAR con garabatos, demo interactiva, `resultados.json` |
+| `dataset/` | dibujos capturados, un PNG por dibujo |
+| `datos/` | dataset sintético, resultados de la prueba de humo y el zip descomprimido |
+| `dataset.zip` | dataset comprimido para subirlo a Colab |
+| `drawcaptcha_resnet.keras` | modelo entrenado |
+| `resultados.json` | métricas exportadas por el notebook |
 
-Aplica las 5 mejoras (la consigna pide 3) y el modelo base sirve para medir cuánto aportan.
+`dataset/` queda fuera de git porque los nombres de archivo llevan el nombre de cada autor.
 
-## Paso 3: informe (`PC03_Codigo_Nombre_Apellido.docx`), uno por integrante
-1. Carátula (curso, PC03, integrantes, nombre y código).
-2. Planteamiento del problema: los CAPTCHA de texto ya los resuelven bots con OCR; proponemos verificar humanos pidiendo dibujar una figura aleatoria.
-3. Justificación: ciberseguridad/autenticación, usabilidad en celular, métricas FAR/FRR como en biometría.
-4. Objetivos (general y 2–3 específicos).
-5. Captura de datos: captura de la página web, cómo funciona, número de imágenes, autores, gráfico de distribución.
-6. Preprocesamiento: inversión, recorte al contenido, 64×64, augmentation.
-7. Arquitectura: modelo base vs. ResNet; tabla de las 5 mejoras; diagrama del bloque residual.
-8. Resultados: capturas del notebook: curvas, matriz de confusión, classification report, tabla comparativa, tabla de ablación, errores, curva FAR/FRR, demo con ACCESO CONCEDIDO/DENEGADO.
-9. Discusión: qué clases se confunden y por qué; efecto del Dropout y de las skip connections.
-10. Conclusiones y trabajo futuro.
-11. Referencias (He et al. 2016 *Deep Residual Learning*; Srivastava et al. 2014 *Dropout*; von Ahn et al. 2003 *CAPTCHA*; Google Quick, Draw!).
+## Formato del dataset
+```
+dataset/
+├── estrella/   estrella_<autor>_<fecha>.png
+├── rayo/
+├── espiral/
+├── corazon/
+└── nube/
+```
+Cada imagen mide 280×280 y tiene trazo negro de 9 px sobre fondo blanco. El notebook toma el autor del segundo campo del nombre de archivo y lo usa para dividir por persona, así que alguien que captura con dos nombres distintos cuenta como dos autores.
 
-Para diferenciar los informes, cada integrante puede probar una variante (por ejemplo `SIZE=32` o `128`, `SPLIT_POR_AUTOR=False` u otro `FAR_MAX`) y comentarla.
+## Paso 1: preparar el entorno local
+1. Instalar Python 3.13 (`py -0p` lista las versiones instaladas).
+2. Crear el entorno e instalar las dependencias desde la raíz del repositorio:
+   ```powershell
+   py -3.13 -m venv .venv
+   .\.venv\Scripts\Activate.ps1
+   pip install -r requirements.txt
+   ```
+3. En VS Code, elegir el intérprete `.venv` con *Python: Select Interpreter* y el kernel `.venv` en el notebook.
 
-## Paso 4: exposición (8 pts, unos 10 min)
-| Min | Quién | Contenido |
+La página de captura no necesita el entorno, porque `servidor.py` no tiene dependencias externas.
+
+## Paso 2: capturar dibujos
+1. Iniciar el servidor:
+   ```powershell
+   python captura\servidor.py          # puerto 8000
+   python captura\servidor.py 8080     # otro puerto
+   ```
+2. Abrir http://localhost:8000, escribir el nombre, elegir la meta por figura y pulsar *Empezar a dibujar*.
+3. La página pide una figura al azar y prioriza la que tiene menos dibujos. Atajos: `Enter` guarda, `C` limpia, `Z` deshace un trazo y `S` salta la figura. *Borrar último* elimina el último dibujo guardado.
+4. Para que dibuje otra persona se usa el enlace *Cambiar*, junto al nombre.
+5. En *Revisar* se marcan los dibujos vacíos, cortados o equivocados y se borran juntos. El borrado no se puede deshacer.
+6. *Progreso* muestra cuántas imágenes hay por figura y por autor.
+
+Para capturar desde un celular conectado a la misma WiFi, el servidor se inicia con `--lan` y en el celular se abre la dirección *Red local* que muestra la consola. Si no carga, hay que permitir Python en el Firewall de Windows. `--lan` solo debe usarse en una red de confianza, porque `/api/borrar` no tiene autenticación.
+
+Si cada integrante capturó en su PC, las carpetas `dataset/<clase>/` se copian en una sola. Los nombres de archivo no chocan porque llevan autor y fecha.
+
+## Paso 3: entrenar en Google Colab
+1. Comprimir la carpeta `dataset` completa, con las 5 subcarpetas dentro, como `dataset.zip`.
+2. En colab.research.google.com, *Subir* → `PC03_Codigo_Nombre_Apellido.ipynb`.
+3. *Entorno de ejecución → Cambiar tipo de entorno → T4 GPU*.
+4. *Entorno de ejecución → Ejecutar todas*. Cuando la celda de carga lo pida, subir `dataset.zip`.
+5. En la sección 10.2 aparece un recuadro para dibujar y probar el CAPTCHA.
+6. Para conservar el modelo y las métricas, descargar `drawcaptcha_resnet.keras` y `resultados.json` desde el panel de archivos de Colab.
+
+El notebook no importa ningún otro archivo del repositorio. Entrena el modelo base, la ResNet y las 5 variantes de la ablación en una sola ejecución.
+
+### Constantes del notebook
+Están al inicio, en la sección 4.
+
+| Constante | Valor | Uso |
 |---|---|---|
-| 0–1:30 | Integrante 1 | Problema: CAPTCHA tradicional roto por bots e idea de DrawCAPTCHA |
-| 1:30–3 | Integrante 2 | Demo en vivo de la web de captura (dibujar desde el celular) y dataset |
-| 3–6 | Integrante 3 | Preprocesamiento, red base vs. ResNet, las 5 mejoras y comparación |
-| 6–7:15 | Integrante 2 | Matriz de confusión y ejemplos de errores |
-| 7:15–8:30 | Integrante 1 | FAR/FRR y umbral del CAPTCHA |
-| 8:30–10 | Todos | Demo final: alguien del público dibuja en Colab y ve ACCESO CONCEDIDO o DENEGADO |
+| `SIZE` | 64 | lado de la imagen de entrada |
+| `EPOCAS` | 80 | máximo de épocas; *EarlyStopping* corta antes |
+| `SEED` | 42 | semilla de Python, NumPy y TensorFlow |
+| `SPLIT_POR_AUTOR` | `True` | cada persona queda en un solo conjunto; necesita 3 autores o más |
+| `FAR_MAX` | 0.01 | FAR máximo en validación al elegir el umbral |
+| `N_GARABATOS` | 500 | garabatos aleatorios para medir el FAR ante un bot |
 
-Puntos a cuidar para el puntaje completo:
-* Hacer la demo en vivo e invitar al profesor a dibujar.
-* Mostrar un intento fallido a propósito (pide estrella, se dibuja un corazón) que termine en ACCESO DENEGADO.
-* Explicar una confusión de la matriz con ejemplos reales de errores.
-* Ensayar y llevar el notebook ya ejecutado por si falla internet.
+## Paso 4: ejecutar el notebook en local
+Sirve para comprobar cambios sin Colab. Se puede abrir en VS Code con el kernel `.venv` o ejecutar completo con `nbconvert`. El notebook busca, dentro del directorio actual, una carpeta que tenga las 5 subcarpetas de clases. Dos variables de entorno cambian su comportamiento:
 
-## Lista final
-- [ ] Dataset con 150–250+ por figura, varias personas, revisado
-- [ ] Notebook ejecutado completo, conclusiones con los números reales
-- [ ] `PC03_Codigo_Nombre_Apellido.ipynb` con código y nombre del integrante
-- [ ] `PC03_Codigo_Nombre_Apellido.docx` con planteamiento, justificación y capturas
-- [ ] Presentación y demo ensayadas
+| Variable | Efecto |
+|---|---|
+| `PC03_DATASET` | ruta del dataset; si no está definida, se busca automáticamente |
+| `PC03_EPOCAS` | reemplaza las 80 épocas, por ejemplo `2` para una ejecución rápida |
+
+Fuera de Colab, la demo de la sección 10.2 no muestra el recuadro: simula un intento genuino y uno impostor con imágenes de prueba.
+
+### Prueba de humo
+Comprueba que el notebook corre de punta a punta con datos falsos. Sus métricas no tienen significado.
+```powershell
+python scripts\crear_dataset_sintetico.py
+$env:PC03_DATASET = "$PWD\datos\sintetico"; $env:PC03_EPOCAS = "2"
+jupyter nbconvert --to notebook --execute PC03_Codigo_Nombre_Apellido.ipynb --output-dir datos\humo
+Remove-Item Env:PC03_DATASET, Env:PC03_EPOCAS
+```
+`crear_dataset_sintetico.py` acepta `--autores` (6 por defecto), `--por-clase` (20 dibujos por autor y clase) y `--salida`. Si se repite con otros argumentos sobre la misma carpeta, quedan los PNG anteriores, así que conviene usar otra `--salida`.
+
+### Editar el notebook
+Después de editarlo hay que normalizar el JSON para que el diff quede pequeño:
+```powershell
+python scripts\normalizar_notebook.py PC03_Codigo_Nombre_Apellido.ipynb
+```
+El script solo cambia el formato de las celdas, no su contenido.
