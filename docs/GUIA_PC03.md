@@ -83,7 +83,7 @@ Son **5 de 5 mejoras** (piden 3) y el modelo base demuestra que mejoran.
 10. **Conclusiones y trabajo futuro**.
 11. **Referencias** (He et al. 2016 *Deep Residual Learning*; Srivastava et al. 2014 *Dropout*; von Ahn et al. 2003 *CAPTCHA*; Google Quick, Draw!).
 
-Para diferenciar los informes de cada integrante: cada uno puede probar una variante (por ejemplo `SIZE=32` o `128`, `SPLIT_POR_AUTOR=True` o otro umbral) y comentarla.
+Para diferenciar los informes de cada integrante: cada uno puede probar una variante (por ejemplo `SIZE=32` o `128`, `SPLIT_POR_AUTOR=False` o otro umbral) y comentarla.
 
 ---
 
