@@ -30,7 +30,7 @@ drawguard-captcha/
 6. Pestaña **Revisar**: borra dibujos vacíos, cortados o equivocados.
 7. Pestaña **Progreso**: mira cuántas imágenes hay por figura y por autor.
 
-**Desde el celular:** la consola muestra una dirección *Red local* (ej. `http://192.168.1.5:8000`). Ábrela en un celular conectado a la misma WiFi. Dibujar con el dedo da más variedad. Si no carga, permite Python en el Firewall de Windows.
+**Desde el celular:** por defecto el servidor solo responde en esta PC. Inícialo con `python servidor.py --lan` y la consola mostrará una dirección *Red local* (ej. `http://192.168.1.5:8000`). Ábrela en un celular conectado a la misma WiFi. Dibujar con el dedo da más variedad. Si no carga, permite Python en el Firewall de Windows. Usa `--lan` solo en una red de confianza: `/api/borrar` no tiene autenticación y cualquiera en esa red podría borrar dibujos.
 
 ### ¿Cuántos dibujos?
 | Nivel | Por figura | Total |
