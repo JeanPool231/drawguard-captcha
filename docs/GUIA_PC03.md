@@ -5,7 +5,9 @@
 drawguard-captcha/
 ├── captura/
 │   ├── servidor.py      ← servidor local (no necesita instalar nada)
-│   └── index.html       ← página de captura estilo CAPTCHA
+│   ├── index.html       ← página de captura estilo CAPTCHA
+│   ├── styles.css       ← estilos
+│   └── app.js           ← lógica de la página
 ├── docs/GUIA_PC03.md    ← esta guía
 ├── dataset/             ← aquí se guardan los dibujos (se crea solo)
 │   ├── estrella/  rayo/  espiral/  corazon/  nube/
