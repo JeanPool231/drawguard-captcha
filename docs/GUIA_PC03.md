@@ -86,8 +86,9 @@ Para diferenciar los informes, cada integrante puede probar una variante (por ej
 |---|---|---|
 | 0–1:30 | Integrante 1 | Problema: CAPTCHA tradicional roto por bots e idea de DrawCAPTCHA |
 | 1:30–3 | Integrante 2 | Demo en vivo de la web de captura (dibujar desde el celular) y dataset |
-| 3–6 | Integrante 3 | Preprocesamiento, red base vs. ResNet, las 5 mejoras |
-| 6–8:30 | Integrante 4 | Matriz de confusión, comparación, FAR/FRR |
+| 3–6 | Integrante 3 | Preprocesamiento, red base vs. ResNet, las 5 mejoras y comparación |
+| 6–7:15 | Integrante 2 | Matriz de confusión y ejemplos de errores |
+| 7:15–8:30 | Integrante 1 | FAR/FRR y umbral del CAPTCHA |
 | 8:30–10 | Todos | Demo final: alguien del público dibuja en Colab y ve ACCESO CONCEDIDO o DENEGADO |
 
 Puntos a cuidar para el puntaje completo:
