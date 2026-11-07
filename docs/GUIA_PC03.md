@@ -61,7 +61,7 @@ Si la exactitud sale baja (<85 %), hay que revisar el dataset en la pestaña *Re
 | Skip connections (ResNet) | función `bloque_residual` |
 | Matriz de confusión | sección 9 (base y mejorada, conteos y %) |
 | Ablación | sección 9.2: base → +64×64 → +Dropout → +capas → +skip connections |
-| Extra | comparación base vs. mejorada, errores, FAR/FRR, FAR con garabatos, demo interactiva |
+| Extra | comparación base vs. mejorada, errores, robustez (sección 9.4), FAR/FRR, FAR con garabatos, demo interactiva, `resultados.json` |
 
 Aplica las 5 mejoras (la consigna pide 3) y el modelo base sirve para medir cuánto aportan.
 
