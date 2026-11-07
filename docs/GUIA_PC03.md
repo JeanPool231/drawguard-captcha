@@ -26,8 +26,8 @@ drawguard-captcha/
 3. Escribe tu nombre, elige la meta (recomendado **40 por figura**) y pulsa **Empezar**.
 4. La página te pide una figura al azar → dibújala → **Enter** (o *Guardar y siguiente*).
    * `C` limpiar · `Z` deshacer trazo · `S` saltar · *Borrar último* si guardaste algo mal.
-5. Cuando termines, pasa la PC/celular a otra persona (botón *Cambiar persona*).
-6. Pestaña **Revisar**: borra dibujos vacíos, cortados o equivocados.
+5. Cuando termines, pasa la PC/celular a otra persona (enlace *cambiar*, junto a tu nombre).
+6. Pestaña **Revisar**: marca los dibujos vacíos, cortados o equivocados y bórralos juntos. El borrado no se puede deshacer.
 7. Pestaña **Progreso**: mira cuántas imágenes hay por figura y por autor.
 
 **Desde el celular:** por defecto el servidor solo responde en esta PC. Inícialo con `python servidor.py --lan` y la consola mostrará una dirección *Red local* (ej. `http://192.168.1.5:8000`). Ábrela en un celular conectado a la misma WiFi. Dibujar con el dedo da más variedad. Si no carga, permite Python en el Firewall de Windows. Usa `--lan` solo en una red de confianza: `/api/borrar` no tiene autenticación y cualquiera en esa red podría borrar dibujos.
