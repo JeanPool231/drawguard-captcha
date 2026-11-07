@@ -1,24 +1,26 @@
 """
 PC03 - CAPTCHA de dibujo | Servidor de captura de datos
 --------------------------------------------------------
-No necesita instalar nada: usa solo la libreria estandar de Python.
+Usa solo la librería estándar de Python.
 
 Uso:
     python servidor.py            (puerto 8000)
     python servidor.py 8080       (otro puerto)
+    python servidor.py --lan      (abre la red local para capturar desde el celular)
 
-Luego abre en el navegador:  http://localhost:8000
-Tus companeros conectados a la MISMA red WiFi pueden abrir la
-direccion "Red local" que aparece en la consola (sirve en celular/tablet).
+Dirección en el navegador:  http://localhost:8000
+Por defecto solo responde en esta PC. Con --lan, quienes estén en la misma red
+WiFi pueden abrir la dirección "Red local" que aparece en la consola (celular/tablet).
 
 Los dibujos se guardan en:  ../dataset/<clase>/<clase>_<autor>_<fecha>.png
 """
+import argparse
 import base64
+import errno
 import json
 import os
 import re
 import socket
-import sys
 from datetime import datetime
 from http.server import SimpleHTTPRequestHandler, ThreadingHTTPServer
 from urllib.parse import parse_qs, urlparse
@@ -27,6 +29,13 @@ CLASES = ["estrella", "rayo", "espiral", "corazon", "nube"]
 AQUI = os.path.dirname(os.path.abspath(__file__))
 DATASET = os.path.abspath(os.path.join(AQUI, "..", "dataset"))
 PNG_HEADER = b"\x89PNG\r\n\x1a\n"
+# Lista blanca: ningún otro archivo de captura/ se sirve (ni servidor.py)
+ESTATICOS = {
+    "/": "/index.html",
+    "/index.html": "/index.html",
+    "/styles.css": "/styles.css",
+    "/app.js": "/app.js",
+}
 
 for c in CLASES:
     os.makedirs(os.path.join(DATASET, c), exist_ok=True)
@@ -41,7 +50,7 @@ def limpiar_autor(texto):
 
 
 def ruta_segura(clase, archivo):
-    """Devuelve la ruta del archivo solo si es valida (evita borrar fuera del dataset)."""
+    """Devuelve la ruta del archivo solo si es válida (evita borrar fuera del dataset)."""
     if clase not in CLASES:
         return None
     archivo = os.path.basename(archivo or "")
@@ -63,10 +72,17 @@ def conteos():
 
 
 class Handler(SimpleHTTPRequestHandler):
+    # Explícito porque el registro de Windows puede cambiar el MIME de .js
+    extensions_map = {
+        **SimpleHTTPRequestHandler.extensions_map,
+        ".js": "text/javascript; charset=utf-8",
+        ".css": "text/css; charset=utf-8",
+    }
+
     def __init__(self, *a, **kw):
         super().__init__(*a, directory=AQUI, **kw)
 
-    def log_message(self, fmt, *args):  # consola mas limpia
+    def log_message(self, fmt, *args):  # consola más limpia
         pass
 
     def _json(self, data, code=200):
@@ -87,7 +103,6 @@ class Handler(SimpleHTTPRequestHandler):
         except Exception:
             return None
 
-    # ---------- GET ----------
     def do_GET(self):
         url = urlparse(self.path)
         if url.path == "/api/stats":
@@ -114,12 +129,14 @@ class Handler(SimpleHTTPRequestHandler):
             self.end_headers()
             self.wfile.write(datos)
             return
-        if url.path in ("/", "/index.html"):
-            self.path = "/index.html"
+        if url.path in ESTATICOS:
+            self.path = ESTATICOS[url.path]
             return super().do_GET()
         return self._json({"error": "no encontrado"}, 404)
 
-    # ---------- POST ----------
+    def do_HEAD(self):  # el heredado se saltaría la lista blanca de do_GET
+        self.send_error(405)
+
     def do_POST(self):
         url = urlparse(self.path)
         datos = self._leer_json()
@@ -158,6 +175,23 @@ class Handler(SimpleHTTPRequestHandler):
         return self._json({"error": "no encontrado"}, 404)
 
 
+class Servidor(ThreadingHTTPServer):
+    # En Windows SO_REUSEADDR deja abrir dos servidores en el mismo puerto sin error
+    allow_reuse_address = os.name != "nt"
+
+    def server_bind(self):
+        if os.name == "nt":
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+        super().server_bind()
+
+
+def puerto_ocupado(puerto):
+    """El bind exclusivo no detecta un servidor en 0.0.0.0 abierto con SO_REUSEADDR."""
+    with socket.socket() as s:
+        s.settimeout(0.5)  # en Windows un puerto libre tarda ~2 s en rechazar
+        return s.connect_ex(("127.0.0.1", puerto)) == 0
+
+
 def ip_local():
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -170,15 +204,32 @@ def ip_local():
 
 
 if __name__ == "__main__":
-    puerto = int(sys.argv[1]) if len(sys.argv) > 1 else 8000
-    servidor = ThreadingHTTPServer(("0.0.0.0", puerto), Handler)
+    parser = argparse.ArgumentParser(description="Servidor de captura de dibujos")
+    parser.add_argument("puerto", nargs="?", type=int, default=8000)
+    parser.add_argument("--lan", action="store_true",
+                        help="escuchar en toda la red local (para capturar desde el celular)")
+    args = parser.parse_args()
+    puerto = args.puerto
+    en_uso = f"el puerto {puerto} ya está en uso, cierra el otro servidor"
+    if puerto_ocupado(puerto):
+        raise SystemExit(en_uso)
+    # /api/borrar no tiene autenticación: la red solo se abre a pedido
+    try:
+        servidor = Servidor(("0.0.0.0" if args.lan else "127.0.0.1", puerto), Handler)
+    except OSError as e:
+        if e.errno != errno.EADDRINUSE:
+            raise
+        raise SystemExit(en_uso)
     print("=" * 58)
     print("  PC03 - CAPTCHA de dibujo | Captura de dataset")
     print("=" * 58)
     print(f"  Esta PC:    http://localhost:{puerto}")
-    ip = ip_local()
-    if ip:
-        print(f"  Red local:  http://{ip}:{puerto}  (celular en la misma WiFi)")
+    if args.lan:
+        ip = ip_local()
+        if ip:
+            print(f"  Red local:  http://{ip}:{puerto}  (celular en la misma WiFi)")
+        print("  AVISO: /api/borrar no tiene autenticacion; cualquiera en esta")
+        print("  red puede borrar dibujos. Usa --lan solo en una red de confianza.")
     print(f"  Dataset en: {DATASET}")
     print("  Ctrl + C para detener")
     print("=" * 58)
