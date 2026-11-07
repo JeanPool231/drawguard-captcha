@@ -63,10 +63,28 @@ input[aria-invalid="true"] { border-color: var(--goma); }
 
 /* ---- inicio ---- */
 #inicio { padding: var(--s4) var(--lateral) var(--s5); }
-#inicio > * { max-width: 460px; }
+.intro, .formulario { display: contents; }
+.intro > *, .formulario > * { max-width: 460px; }
 #inicio h1 { font-size: 60px; }
 #inicio .btn { width: 100%; min-height: 56px; margin-top: var(--s4); font-size: 18px; }
 #errorInicio:not(:empty) { margin-top: var(--s3); }
+.vista { display: none; }
+/* Escritorio: texto y figuras a la izquierda, formulario en una hoja a la derecha */
+@media (min-width: 900px) {
+  #inicio { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 420px); column-gap: var(--s5); align-items: center;
+    min-height: calc(var(--alto) - var(--cabecera) - 2px); padding-block: var(--s5); }
+  .intro { display: block; }
+  .intro > * { max-width: 520px; }
+  #inicio h1 { font-size: clamp(60px, 6vw, 84px); margin-bottom: var(--s3); }
+  .intro p { font-size: 18px; }
+  .vista { display: grid; grid-template-columns: repeat(5, 1fr); gap: var(--s2); margin: var(--s4) 0 0; padding: 0; list-style: none; }
+  .vista li { display: grid; justify-items: center; gap: var(--s2); padding: var(--s3) var(--s1) var(--s2);
+    background: var(--hoja); border: 2px solid var(--grafito); border-radius: 4px; font-weight: 600; font-size: 15px; }
+  .vista .icono { width: 44px; height: 44px; }
+  .formulario { display: block; background: var(--hoja); border: 2px solid var(--grafito); border-radius: 4px; padding: var(--s5); }
+  .formulario > * { max-width: none; }
+  .formulario > label:first-child { margin-top: 0; }
+}
 
 /* ---- pantalla de dibujo: celular ---- */
 #captura { display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto auto;
