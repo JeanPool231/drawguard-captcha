@@ -37,7 +37,10 @@ document.querySelectorAll("nav button").forEach(b => b.onclick = () => irA(b.dat
 function irA(tab) {
   document.querySelectorAll("nav button").forEach(b => b.classList.toggle("on", b.dataset.tab === tab));
   ["inicio", "captura", "revisar", "progreso"].forEach(s => $(s).classList.add("hidden"));
-  if (tab === "capturar") $(autor ? "captura" : "inicio").classList.remove("hidden");
+  if (tab === "capturar") {
+    $(autor ? "captura" : "inicio").classList.remove("hidden");
+    if (autor) { pintarMiProgreso(); if (!actual) siguiente(); }
+  }
   if (tab === "revisar") { $("revisar").classList.remove("hidden"); prepararRevisar(); }
   if (tab === "progreso") { $("progreso").classList.remove("hidden"); pintarProgresoEquipo(); }
 }
@@ -60,7 +63,7 @@ $("cambiar").onclick = () => { autor = ""; ultimo = null; $("deshacerGuardado").
 
 /* ---------------- Lienzo ---------------- */
 const cv = $("lienzo"), ctx = cv.getContext("2d");
-let trazos = [], trazo = null;
+let trazos = [], trazo = null, punteroActivo = null;
 function redibujar() {
   ctx.fillStyle = "#fff"; ctx.fillRect(0, 0, cv.width, cv.height);
   ctx.strokeStyle = "#000"; ctx.lineWidth = 9; ctx.lineCap = "round"; ctx.lineJoin = "round";
@@ -73,9 +76,9 @@ function redibujar() {
 }
 function punto(e) { const r = cv.getBoundingClientRect();
   return [(e.clientX - r.left) * cv.width / r.width, (e.clientY - r.top) * cv.height / r.height]; }
-cv.addEventListener("pointerdown", e => { cv.setPointerCapture(e.pointerId); trazo = [punto(e)]; trazos.push(trazo); redibujar(); mensaje(""); });
-cv.addEventListener("pointermove", e => { if (!trazo) return; trazo.push(punto(e)); redibujar(); });
-["pointerup", "pointercancel", "pointerleave"].forEach(ev => cv.addEventListener(ev, () => trazo = null));
+cv.addEventListener("pointerdown", e => { if (trazo) return; punteroActivo = e.pointerId; cv.setPointerCapture(e.pointerId); trazo = [punto(e)]; trazos.push(trazo); redibujar(); mensaje(""); });
+cv.addEventListener("pointermove", e => { if (!trazo || e.pointerId !== punteroActivo) return; trazo.push(punto(e)); redibujar(); });
+["pointerup", "pointercancel", "pointerleave"].forEach(ev => cv.addEventListener(ev, e => { if (e.pointerId === punteroActivo) trazo = null; }));
 function limpiar() { trazos = []; redibujar(); }
 redibujar();
 
@@ -89,18 +92,21 @@ function dibujoValido() {
 }
 
 /* ---------------- Flujo de captura ---------------- */
-function siguiente() {
+function siguiente(saltando) {
   const mis = misConteos();
   const pendientes = Object.keys(CLASES).filter(c => mis[c] < meta);
   if (!pendientes.length) {
     actual = null;
     $("emoji").textContent = "🎉"; $("objetivo").textContent = "¡META CUMPLIDA!";
     mensaje("Completaste tu meta. Puedes subirla en 'Cambiar persona' o pasar el turno a otra persona.", "ok");
+    limpiar();
     return;
   }
   // Prioriza la figura con menos dibujos (dataset balanceado) y desempata al azar
-  const minimo = Math.min(...pendientes.map(c => mis[c]));
-  let candidatos = pendientes.filter(c => mis[c] === minimo);
+  const otras = pendientes.filter(c => c !== actual);
+  const opciones = saltando && otras.length ? otras : pendientes;
+  const minimo = Math.min(...opciones.map(c => mis[c]));
+  let candidatos = opciones.filter(c => mis[c] === minimo);
   if (candidatos.length > 1 && actual) candidatos = candidatos.filter(c => c !== actual) ;
   actual = candidatos[Math.floor(Math.random() * candidatos.length)];
   $("emoji").textContent = CLASES[actual].emoji; $("objetivo").textContent = CLASES[actual].nombre;
@@ -108,7 +114,7 @@ function siguiente() {
 }
 
 async function guardar() {
-  if (!actual) return;
+  if (!actual || $("guardar").disabled) return;
   const error = dibujoValido();
   if (error) { mensaje(error, "bad"); return; }
   $("guardar").disabled = true;
@@ -127,21 +133,29 @@ async function borrarUltimo() {
     stats = await api("/api/borrar", ultimo);
     toast(`Borrado: ${CLASES[ultimo.clase].nombre}`);
     ultimo = null; $("deshacerGuardado").disabled = true; pintarMiProgreso();
+    if (!actual) { siguiente(); mensaje(""); }
   } catch (e) { toast("No se pudo borrar"); }
 }
 
 $("guardar").onclick = guardar;
 $("limpiar").onclick = () => { limpiar(); mensaje(""); };
 $("deshacerTrazo").onclick = () => { trazos.pop(); redibujar(); };
-$("saltar").onclick = siguiente;
+$("saltar").onclick = () => siguiente(true);
 $("deshacerGuardado").onclick = borrarUltimo;
+// Un clic no deja el foco en el botón: si no, Enter lo repetiría en vez de guardar
+$("captura").addEventListener("click", e => { if (e.detail) e.target.closest("button")?.blur(); });
 document.addEventListener("keydown", e => {
   if ($("captura").classList.contains("hidden") || e.target.tagName === "INPUT" || e.target.tagName === "SELECT") return;
+  if (e.ctrlKey || e.altKey || e.metaKey) return;
   const k = e.key.toLowerCase();
-  if (k === "enter") { e.preventDefault(); guardar(); }
+  if (k === "enter") {
+    if (e.target.tagName === "BUTTON") return;  // con Tab, Enter activa ese botón
+    e.preventDefault();
+    if (!e.repeat) guardar();
+  }
   else if (k === "c") { limpiar(); mensaje(""); }
   else if (k === "z") { trazos.pop(); redibujar(); }
-  else if (k === "s") siguiente();
+  else if (k === "s") siguiente(true);
 });
 
 function barra(c, n, objetivo) {
@@ -186,7 +200,8 @@ async function pintarGaleria() {
   $("galeria").innerHTML = lista.map(f => `<div class="thumb"><img loading="lazy" src="/img/${clase}/${f}" alt="">
     <button title="Eliminar" data-f="${f}">×</button><small>${f.split("_")[1]}</small></div>`).join("");
   $("galeria").querySelectorAll("button").forEach(b => b.onclick = async () => {
-    await api("/api/borrar", { clase, archivo: b.dataset.f });
+    stats = await api("/api/borrar", { clase, archivo: b.dataset.f });
+    if (ultimo && ultimo.archivo === b.dataset.f) { ultimo = null; $("deshacerGuardado").disabled = true; }
     b.parentElement.remove();
     $("cuentaRevisar").textContent = `${$("galeria").children.length} dibujos`;
   });
