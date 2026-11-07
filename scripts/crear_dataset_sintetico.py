@@ -85,7 +85,7 @@ def main():
         os.makedirs(os.path.join(salida, clase), exist_ok=True)
         for autor in range(1, args.autores + 1):
             for n in range(args.por_clase):
-                # shortcut: repetir con otros argumentos deja los PNG anteriores, usa otra --salida
+                # Límite: repetir con otros argumentos deja los PNG anteriores; hace falta otra --salida
                 nombre = f"{clase}_sintetico-{autor}_20260101-000000-{n:06d}.png"
                 dibujar(clase, rng).save(os.path.join(salida, clase, nombre))
 

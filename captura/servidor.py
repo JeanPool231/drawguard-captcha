@@ -1,16 +1,16 @@
 """
 PC03 - CAPTCHA de dibujo | Servidor de captura de datos
 --------------------------------------------------------
-No necesita instalar nada: usa solo la libreria estandar de Python.
+Usa solo la librería estándar de Python.
 
 Uso:
     python servidor.py            (puerto 8000)
     python servidor.py 8080       (otro puerto)
     python servidor.py --lan      (abre la red local para capturar desde el celular)
 
-Luego abre en el navegador:  http://localhost:8000
-Por defecto solo responde en esta PC. Con --lan, quienes esten en la MISMA red
-WiFi pueden abrir la direccion "Red local" que aparece en la consola (celular/tablet).
+Dirección en el navegador:  http://localhost:8000
+Por defecto solo responde en esta PC. Con --lan, quienes estén en la misma red
+WiFi pueden abrir la dirección "Red local" que aparece en la consola (celular/tablet).
 
 Los dibujos se guardan en:  ../dataset/<clase>/<clase>_<autor>_<fecha>.png
 """
@@ -29,7 +29,7 @@ CLASES = ["estrella", "rayo", "espiral", "corazon", "nube"]
 AQUI = os.path.dirname(os.path.abspath(__file__))
 DATASET = os.path.abspath(os.path.join(AQUI, "..", "dataset"))
 PNG_HEADER = b"\x89PNG\r\n\x1a\n"
-# Lista blanca: ningun otro archivo de captura/ se sirve (ni servidor.py)
+# Lista blanca: ningún otro archivo de captura/ se sirve (ni servidor.py)
 ESTATICOS = {
     "/": "/index.html",
     "/index.html": "/index.html",
@@ -50,7 +50,7 @@ def limpiar_autor(texto):
 
 
 def ruta_segura(clase, archivo):
-    """Devuelve la ruta del archivo solo si es valida (evita borrar fuera del dataset)."""
+    """Devuelve la ruta del archivo solo si es válida (evita borrar fuera del dataset)."""
     if clase not in CLASES:
         return None
     archivo = os.path.basename(archivo or "")
@@ -72,7 +72,7 @@ def conteos():
 
 
 class Handler(SimpleHTTPRequestHandler):
-    # Explicito porque el registro de Windows puede cambiar el MIME de .js
+    # Explícito porque el registro de Windows puede cambiar el MIME de .js
     extensions_map = {
         **SimpleHTTPRequestHandler.extensions_map,
         ".js": "text/javascript; charset=utf-8",
@@ -82,7 +82,7 @@ class Handler(SimpleHTTPRequestHandler):
     def __init__(self, *a, **kw):
         super().__init__(*a, directory=AQUI, **kw)
 
-    def log_message(self, fmt, *args):  # consola mas limpia
+    def log_message(self, fmt, *args):  # consola más limpia
         pass
 
     def _json(self, data, code=200):
@@ -103,7 +103,6 @@ class Handler(SimpleHTTPRequestHandler):
         except Exception:
             return None
 
-    # ---------- GET ----------
     def do_GET(self):
         url = urlparse(self.path)
         if url.path == "/api/stats":
@@ -135,10 +134,9 @@ class Handler(SimpleHTTPRequestHandler):
             return super().do_GET()
         return self._json({"error": "no encontrado"}, 404)
 
-    def do_HEAD(self):  # el heredado se saltaria la lista blanca de do_GET
+    def do_HEAD(self):  # el heredado se saltaría la lista blanca de do_GET
         self.send_error(405)
 
-    # ---------- POST ----------
     def do_POST(self):
         url = urlparse(self.path)
         datos = self._leer_json()
@@ -215,7 +213,7 @@ if __name__ == "__main__":
     en_uso = f"el puerto {puerto} ya está en uso, cierra el otro servidor"
     if puerto_ocupado(puerto):
         raise SystemExit(en_uso)
-    # /api/borrar no tiene autenticacion: la red solo se abre a pedido
+    # /api/borrar no tiene autenticación: la red solo se abre a pedido
     try:
         servidor = Servidor(("0.0.0.0" if args.lan else "127.0.0.1", puerto), Handler)
     except OSError as e:
