@@ -26,7 +26,7 @@ drawguard-captcha/
 3. Escribe tu nombre, elige la meta (recomendado **40 por figura**) y pulsa **Empezar**.
 4. La página te pide una figura al azar → dibújala → **Enter** (o *Guardar y siguiente*).
    * `C` limpiar · `Z` deshacer trazo · `S` saltar · *Borrar último* si guardaste algo mal.
-5. Cuando termines, pasa la PC/celular a otra persona (enlace *cambiar*, junto a tu nombre).
+5. Cuando termines, pasa la PC/celular a otra persona (enlace *Cambiar*, junto a tu nombre).
 6. Pestaña **Revisar**: marca los dibujos vacíos, cortados o equivocados y bórralos juntos. El borrado no se puede deshacer.
 7. Pestaña **Progreso**: mira cuántas imágenes hay por figura y por autor.
 
