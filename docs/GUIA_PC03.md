@@ -2,10 +2,11 @@
 
 ## Archivos del proyecto
 ```
-pc_imagenes/
+drawguard-captcha/
 ├── captura/
 │   ├── servidor.py      ← servidor local (no necesita instalar nada)
 │   └── index.html       ← página de captura estilo CAPTCHA
+├── docs/GUIA_PC03.md    ← esta guía
 ├── dataset/             ← aquí se guardan los dibujos (se crea solo)
 │   ├── estrella/  rayo/  espiral/  corazon/  nube/
 └── PC03_Codigo_Nombre_Apellido.ipynb   ← notebook (Colab)
@@ -15,7 +16,7 @@ pc_imagenes/
 
 ## PASO 1 · Crear el dataset (sí, lo crean ustedes)
 
-1. Abre una terminal en `C:\pc_imagenes\captura` y ejecuta:
+1. Abre una terminal en la carpeta `captura` del repositorio y ejecuta:
    ```
    python servidor.py
    ```

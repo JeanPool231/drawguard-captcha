@@ -1,0 +1,8 @@
+.venv/
+dataset/
+datos/
+*.keras
+*.zip
+__pycache__/
+.ipynb_checkpoints/
+.claude/settings.local.json
