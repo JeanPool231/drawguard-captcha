@@ -20,5 +20,11 @@ python captura\servidor.py
 ```
 Abre http://localhost:8000. Los dibujos se guardan en `dataset/`, que no se sube a git porque contiene nombres de autores.
 
+El servidor solo responde en esta PC. Para capturar desde el celular, inícialo con `--lan` y abre la dirección *Red local* que muestra la consola, con el celular en la misma WiFi:
+```powershell
+python captura\servidor.py --lan
+```
+Úsalo solo en una red de confianza: `/api/borrar` no tiene autenticación y cualquiera en esa red podría borrar dibujos.
+
 ## Entrenar
 El entrenamiento real se hace en Google Colab con GPU T4: comprime `dataset/` como `dataset.zip`, sube `PC03_Codigo_Nombre_Apellido.ipynb` y ejecuta todas las celdas. El notebook no necesita ningún otro archivo del repositorio. `requirements.txt` es solo para el entorno local; Colab usa sus propias versiones.
