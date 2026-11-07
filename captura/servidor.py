@@ -16,6 +16,7 @@ Los dibujos se guardan en:  ../dataset/<clase>/<clase>_<autor>_<fecha>.png
 """
 import argparse
 import base64
+import errno
 import json
 import os
 import re
@@ -176,6 +177,23 @@ class Handler(SimpleHTTPRequestHandler):
         return self._json({"error": "no encontrado"}, 404)
 
 
+class Servidor(ThreadingHTTPServer):
+    # En Windows SO_REUSEADDR deja abrir dos servidores en el mismo puerto sin error
+    allow_reuse_address = os.name != "nt"
+
+    def server_bind(self):
+        if os.name == "nt":
+            self.socket.setsockopt(socket.SOL_SOCKET, socket.SO_EXCLUSIVEADDRUSE, 1)
+        super().server_bind()
+
+
+def puerto_ocupado(puerto):
+    """El bind exclusivo no detecta un servidor en 0.0.0.0 abierto con SO_REUSEADDR."""
+    with socket.socket() as s:
+        s.settimeout(0.5)  # en Windows un puerto libre tarda ~2 s en rechazar
+        return s.connect_ex(("127.0.0.1", puerto)) == 0
+
+
 def ip_local():
     try:
         s = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
@@ -194,8 +212,16 @@ if __name__ == "__main__":
                         help="escuchar en toda la red local (para capturar desde el celular)")
     args = parser.parse_args()
     puerto = args.puerto
+    en_uso = f"el puerto {puerto} ya está en uso, cierra el otro servidor"
+    if puerto_ocupado(puerto):
+        raise SystemExit(en_uso)
     # /api/borrar no tiene autenticacion: la red solo se abre a pedido
-    servidor = ThreadingHTTPServer(("0.0.0.0" if args.lan else "127.0.0.1", puerto), Handler)
+    try:
+        servidor = Servidor(("0.0.0.0" if args.lan else "127.0.0.1", puerto), Handler)
+    except OSError as e:
+        if e.errno != errno.EADDRINUSE:
+            raise
+        raise SystemExit(en_uso)
     print("=" * 58)
     print("  PC03 - CAPTCHA de dibujo | Captura de dataset")
     print("=" * 58)
