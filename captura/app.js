@@ -5,7 +5,7 @@ const CLASES = {
   corazon:  { nombre: "CORAZÓN",  corto: "corazón",  guia: "Dibuja un" },
   nube:     { nombre: "NUBE",     corto: "nube",     guia: "Dibuja una" },
 };
-const META_EQUIPO = 250, MINIMO_EQUIPO = 150;
+const META_EQUIPO = 260, MINIMO_EQUIPO = 150;
 const SIN_SERVIDOR = "No hay conexión con el servidor. Comprueba que siga abierto.";
 const $ = id => document.getElementById(id);
 const store = {

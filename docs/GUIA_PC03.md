@@ -35,8 +35,9 @@ Por defecto el servidor solo responde en esta PC. Para capturar desde el celular
 |---|---|---|
 | Mínimo aceptable | 150 | 750 |
 | Recomendado | 250+ | 1250+ |
+| Dataset del equipo | 260 | 1300 |
 
-Por ejemplo, 4 integrantes × 40 por figura = 160 por figura. Si 2 o 3 familiares o amigos dibujan 20–30 cada uno se llega a 250. Con más personas distintas la red es más robusta, y es un dato que se puede contar en la exposición.
+El dataset del equipo tiene 1300 dibujos, 260 por figura, de 4 personas: los 3 integrantes y un colaborador. Con más personas distintas la red es más robusta, y es un dato que se puede contar en la exposición.
 
 ### Juntar el dataset del equipo
 Si cada integrante capturó en su PC, las carpetas `dataset/<clase>/` se copian en una sola (los nombres de archivo no chocan porque llevan autor y fecha). Luego se comprime `dataset` como `dataset.zip`. Todo el equipo usa el mismo `dataset.zip`.
@@ -85,8 +86,9 @@ Para diferenciar los informes, cada integrante puede probar una variante (por ej
 |---|---|---|
 | 0–1:30 | Integrante 1 | Problema: CAPTCHA tradicional roto por bots e idea de DrawCAPTCHA |
 | 1:30–3 | Integrante 2 | Demo en vivo de la web de captura (dibujar desde el celular) y dataset |
-| 3–6 | Integrante 3 | Preprocesamiento, red base vs. ResNet, las 5 mejoras |
-| 6–8:30 | Integrante 4 | Matriz de confusión, comparación, FAR/FRR |
+| 3–6 | Integrante 3 | Preprocesamiento, red base vs. ResNet, las 5 mejoras y comparación |
+| 6–7:15 | Integrante 2 | Matriz de confusión y ejemplos de errores |
+| 7:15–8:30 | Integrante 1 | FAR/FRR y umbral del CAPTCHA |
 | 8:30–10 | Todos | Demo final: alguien del público dibuja en Colab y ve ACCESO CONCEDIDO o DENEGADO |
 
 Puntos a cuidar para el puntaje completo:
